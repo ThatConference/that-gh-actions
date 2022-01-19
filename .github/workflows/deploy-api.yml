@@ -1,0 +1,88 @@
+name: Shared API Deploy Action
+
+on:
+  workflow_call:
+    inputs:
+      apiName:
+        description: 'Name of api being deployed'
+        type: string
+        required: true
+      runMemory:
+        description: 'Amount of memory to allocate to google run'
+        type: string
+        required: false
+        default: '256Mi'
+
+    secrets:
+      GCLOUD_AUTH:
+        required: true
+      GCP_PROJECT_ID:
+        required: true
+      SLACK_WEBHOOK_DEV_NOTIFICATIONS:
+        required: true
+      
+
+jobs:
+  validate_input:
+    name: Validate inputs
+    runs-on: ubuntu-latest
+    steps:
+      - name: apiName is valid
+        if: ! contains(['events','partners','sessions','members','garage','communications'], ${{ inputs.apiName }})
+        run: |
+          echo 'Unable to deploy, invalid apiName provided'
+          echo 'apiName: ${{ inputs.apiName }}'
+          exit 1
+      - name: runMemory is valid
+        if: ! contains(['256Mi', '512Mi', '1024Mi', '2048Mi', '1Gi', '2Gi', '3Gi', '4Gi'], runMemory)
+        run: |
+          echo 'Unable to deploy, invalid runMemory value provided'
+          echo 'runMemory: ${{ inputs.runMemory }}'
+          exit 1
+
+  deploy:
+    name: Deploy ${{ inputs.apiName}} to Cloud Run
+    needs: validate_input
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: tc-api
+          path: __build__
+      - name: Setup GCP Actions
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: '360.0.0'
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: gcloud docker cred helper
+        run: gcloud auth configure-docker
+        env:
+          CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Build docker image
+        run: |
+          cp __build__/Dockerfile ./ && rm __build__/Dockerfile
+          docker build . --tag us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }}
+      - name: Publish image to gcp
+        run: docker push us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }}
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud secrets versions access latest --secret any-secrets2array-util_file > secrets2array.sh && chmod +x secrets2array.sh
+          GCR_ENV_VARS=$(gcloud secrets versions access latest --secret prod-api-non_gateway-env | ./secrets2array.sh)
+          C_CNT=$(cat __build__/ccnt.txt)
+          SENTRYREL=SENTRY_VERSION=that-api-${{ inputs.apiName }}@$(cat __build__/package.json | jq '.version' | tr -d '"')-$C_CNT.$(echo $GITHUB_SHA | cut -c1-7)
+          GCR_ENV_VARS="${GCR_ENV_VARS}, ${SENTRYREL}"
+          gcloud run deploy ${{ inputs.apiName }} --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }} --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars="$GCR_ENV_VARS" --timeout=300 --memory=${{ inputs.runMemory }} --cpu=1
+        env:
+          CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          fields: repo,message,commit,author,eventName,ref,workflow,job,took
+          status: ${{ job.status }}
+          author_name: Push Master CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+        if: job.status == 'failure' || job.status == 'cancelled'

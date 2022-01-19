@@ -1,0 +1,62 @@
+name: Shared API Build Action
+
+on:
+  workflow_call:
+    inputs:
+      isForDeploy:
+        description: 'Is build stand-alone or part of deploy?'
+        type: boolean
+        required: true
+      apiName:
+        description: 'Name of api being built'
+        type: string
+        required: true
+    secrets:
+      SLACK_WEBHOOK_DEV_NOTIFICATIONS:
+        required: true      
+
+jobs:
+  build:
+    name: Build ${{ apiName }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - name: npm ci, run validate
+        run: |
+          cp .env.sample .env
+          npm ci
+          npm run validate
+          rm .env
+        env:
+          CI: true
+          HUSKY: 0
+      - name: Post-Build Copies
+        run: |
+          cp ./package.json __build__/
+          cp ./package-lock.json __build__/
+          cp ./Dockerfile __build__/
+          git rev-list --count master > __build__/ccnt.txt
+        if: ${{ inputs.isForDeploy }}
+      - name: Archive Build Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: tc-api
+          path: __build__
+        if: ${{ inputs.isForDeploy }}
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          fields: repo,message,commit,author,eventName,ref,workflow,job,took
+          status: ${{ job.status }}
+          author_name: Push Master CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+        if: job.status == 'failure' || job.status == 'cancelled'

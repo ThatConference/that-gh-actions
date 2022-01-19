@@ -32,6 +32,8 @@ jobs:
       SLACK_WEBHOOK_DEV_NOTIFICATIONS: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
 ```
 
+And another example "caller" workflow:
+
 ```yml
 name: CI on Push Master
 
@@ -69,4 +71,19 @@ jobs:
     uses: thatconference/that-gh-actions/.github/workflows/refresh-gateway-schema.yml@main
     with:
       apiName: communications
+
+  notifications:
+    name: Workflow notifications
+    needs: [build,deploy,refresh]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          fields: repo,message,commit,author,eventName,ref,workflow
+          status: ${{ job.status }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+        if: always()
 ```

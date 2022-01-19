@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: apiName is valid
-        if: contains(fromJson('["events","partners","sessions","members","garage","communication"]'), inputs.apiName) == false
+        if: contains(fromJson('["events","partners","sessions","members","garage","communications"]'), inputs.apiName) == false
         run: |
           echo 'Unable to deploy, invalid apiName provided'
           echo 'apiName: ${{ inputs.apiName }}'

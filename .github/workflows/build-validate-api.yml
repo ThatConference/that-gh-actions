@@ -42,7 +42,7 @@ jobs:
           cp ./package.json __build__/
           cp ./package-lock.json __build__/
           cp ./Dockerfile __build__/
-          git rev-list --count master > __build__/ccnt.txt
+          git rev-list --count ${{ env.GITHUB_REF_NAME }} > __build__/ccnt.txt
         if: ${{ inputs.isForDeploy }}
       - name: Archive Build Artifact
         uses: actions/upload-artifact@v1
@@ -55,7 +55,7 @@ jobs:
         with:
           fields: repo,message,commit,author,eventName,ref,workflow,job,took
           status: ${{ job.status }}
-          author_name: Push Master CI
+          author_name: CI onPush Action
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}

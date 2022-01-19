@@ -1,0 +1,20 @@
+name: Refresh gateway GraphQL Schema
+
+on:
+  workflow_call:
+    inputs:
+      apiName:
+        description: 'Name of api deployment calling this workflow'
+        type: string
+        required: true
+
+jobs:
+  refresh:
+    name: Send Schema Refresh Request
+    runs-on: ubuntu-latest
+    steps:
+      - name: GET request refresh
+        run: |
+          REFRESH_RESULT=$(curl -s -f https://api.that.tech/.internal/apollo/schema-refresh?src=${{ apiName }} | jq '.status')
+          echo result $REFRESH_RESULT
+          if [ $REFRESH_RESULT != '"reloaded"' ]; then exit 99; fi

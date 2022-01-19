@@ -28,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: apiName is valid
-        if: contains(['events','partners','sessions','members','garage','communications'], inputs.apiName) == false
+        if: contains(fromJson('["events","partners","sessions","members","garage","communications"]'), inputs.apiName) == false
         run: |
           echo 'Unable to deploy, invalid apiName provided'
           echo 'apiName: ${{ inputs.apiName }}'
           exit 1
       - name: runMemory is valid
-        if: contains(['256Mi', '512Mi', '1024Mi', '2048Mi', '1Gi', '2Gi', '3Gi', '4Gi'], inputs.runMemory) == false
+        if: contains(fromJson('["256Mi", "512Mi", "1024Mi", "2048Mi", "1Gi", "2Gi", "3Gi", "4Gi"]'), inputs.runMemory) == false
         run: |
           echo 'Unable to deploy, invalid runMemory value provided'
           echo 'runMemory: ${{ inputs.runMemory }}'

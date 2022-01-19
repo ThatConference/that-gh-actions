@@ -11,6 +11,10 @@ on:
         description: 'Name of api being built'
         type: string
         required: true
+      branchName:
+        description: 'Branch name which triggered action (GITHUB_REF_NAME)'
+        type: string
+        required: true
     secrets:
       SLACK_WEBHOOK_DEV_NOTIFICATIONS:
         required: true      
@@ -42,14 +46,14 @@ jobs:
           cp ./package.json __build__/
           cp ./package-lock.json __build__/
           cp ./Dockerfile __build__/
-          git rev-list --count ${{ env.GITHUB_REF_NAME }} > __build__/ccnt.txt
-        if: ${{ inputs.isForDeploy }}
+          git rev-list --count ${{ inputs.branchName }} > __build__/ccnt.txt
+        if: inputs.isForDeploy
       - name: Archive Build Artifact
         uses: actions/upload-artifact@v1
         with:
           name: tc-api
           path: __build__
-        if: ${{ inputs.isForDeploy }}
+        if: inputs.isForDeploy
       - name: Slack Notification
         uses: 8398a7/action-slack@v3
         with:

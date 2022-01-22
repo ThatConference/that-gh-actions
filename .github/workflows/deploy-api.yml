@@ -79,7 +79,7 @@ jobs:
       - name: Deploy to Cloud Run
         run: |
           gcloud secrets versions access latest --secret any-secrets2array-util_file > secrets2array.sh && chmod +x secrets2array.sh
-          GCR_ENV_VARS=$(gcloud secrets versions access latest --secret {{ inputs.gcpSecretName }} | ./secrets2array.sh)
+          GCR_ENV_VARS=$(gcloud secrets versions access latest --secret ${{ inputs.gcpSecretName }} | ./secrets2array.sh)
           C_CNT=$(cat __build__/ccnt.txt)
           SENTRYREL=SENTRY_VERSION=that-api-${{ inputs.apiName }}@$(cat __build__/package.json | jq '.version' | tr -d '"')-$C_CNT.$(echo $GITHUB_SHA | cut -c1-7)
           GCR_ENV_VARS="${GCR_ENV_VARS}, ${SENTRYREL}"

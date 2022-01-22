@@ -1,0 +1,47 @@
+name: Redeploy gateway
+# Redeploys GraphQL gateway forcing it to reload schema's all sub-graphs
+
+on:
+  workflow_dispatch:
+    inputs:
+      runMemory:
+        description: 'Amount of memory to allocate to google run'
+        type: string
+        required: false
+        default: '256Mi'
+    secrets:
+      GCLOUD_AUTH:
+        required: true
+      GCP_PROJECT_ID:
+        required: true
+      SLACK_WEBHOOK_DEV_NOTIFICATIONS:
+        required: true
+
+jobs:
+  redeploy:
+    name: Redeploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup gcloud action
+        uses: google-github-actions/setup-gcloud@v0
+        with:
+          version: '360.0.0'
+          service_account_key: ${{ secrets.GCLOUD_AUTH }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Redeploy on Cloud Run
+        # Environment vars should remain between deploys if not specified in command
+        run: |
+          gcloud run deploy gateway --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/gateway --region=us-central1 --platform=managed --allow-unauthenticated --timeout=300 --memory=${{ inputs.runMemory }} --cpu=1
+        env:
+          CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Slack Failure Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          fields: repo,message,commit,author,eventName,ref,workflow,job,took
+          status: ${{ job.status }}
+          author_name: Push Master CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+        if: job.status == 'failure' || job.status == 'cancelled'
+

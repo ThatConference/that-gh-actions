@@ -54,7 +54,7 @@ jobs:
           name: tc-api
           path: __build__
         if: inputs.isForDeploy
-      - name: Slack Notification
+      - name: Slack Failure Notification
         uses: 8398a7/action-slack@v3
         with:
           fields: repo,message,commit,author,eventName,ref,workflow,job,took

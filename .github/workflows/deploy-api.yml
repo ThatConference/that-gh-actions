@@ -76,7 +76,7 @@ jobs:
           gcloud run deploy ${{ inputs.apiName }} --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }} --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars="$GCR_ENV_VARS" --timeout=300 --memory=${{ inputs.runMemory }} --cpu=1
         env:
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
-      - name: Slack Notification
+      - name: Slack Failure Notification
         uses: 8398a7/action-slack@v3
         with:
           fields: repo,message,commit,author,eventName,ref,workflow,job,took

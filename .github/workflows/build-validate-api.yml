@@ -12,7 +12,7 @@ on:
         type: string
         required: true
       branchName:
-        description: 'Branch name which triggered action (GITHUB_REF_NAME)'
+        description: 'Branch name which triggered action (github.ref_name)'
         type: string
         required: true
     secrets:
@@ -24,6 +24,12 @@ jobs:
     name: Build ${{ inputs.apiName }}
     runs-on: ubuntu-latest
     steps:
+      - name: First Interaction
+        uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          issue-message: 'This is your first submitted issue, THANK YOU! Someone will review shortly.'
+          pr-message: 'This is your your first PR, THANK YOU! Someone will review shortly.'
       - name: Checkout
         uses: actions/checkout@v2
         with:

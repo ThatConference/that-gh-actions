@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: apiName is valid
-        if: contains(fromJson('["events","partners","sessions","members","garage","communications"]'), inputs.apiName) == false
+        if: contains(fromJson('["gateway","events","partners","sessions","members","garage","communications"]'), inputs.apiName) == false
         run: |
           echo 'Unable to deploy, invalid apiName provided'
           echo 'apiName: ${{ inputs.apiName }}'
@@ -42,7 +42,13 @@ jobs:
         run: |
           echo 'Unable to deploy, invalid runMemory value provided'
           echo 'runMemory: ${{ inputs.runMemory }}'
-          exit 1
+          exit 2
+      - name: validate secret name to api name
+        if: inputs.apiName == 'gateway' && contains(inputs.gcpSecretName, 'non_gateway')
+        run: |
+          echo 'Unable to deploy gateway, gcp secret for non_gateway'
+          echo 'gcpSecretName: ${{ inputs.gcpSecretName }}'
+          exit 3
 
   deploy:
     name: Deploy ${{ inputs.apiName}} to Cloud Run

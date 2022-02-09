@@ -1,7 +1,7 @@
 name: Check for New YouTube Comments and Add to Orbit
 on:
   schedule:
-    - cron: "0 0 * * *"
+    - cron: "10 0 * * *"
   workflow_dispatch:
 jobs:
   main:
@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: '14'
       - name: Get Comments & Add to Orbit
-        run: npx @orbit-love/youtube --comments --hours=1440
+        run: npx @orbit-love/youtube --comments --hours=25
         env:
           ORBIT_WORKSPACE_ID: ${{ secrets.ORBIT_WORKSPACE_ID }}
           ORBIT_API_KEY: ${{ secrets.ORBIT_API_KEY }}

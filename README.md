@@ -60,6 +60,7 @@ jobs:
     with:
       apiName: communications
       runMemory: 256Mi
+      minInstances: 0
     secrets:
       GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}

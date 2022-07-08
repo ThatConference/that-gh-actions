@@ -21,7 +21,7 @@ on:
         description: 'Minimum instances for Google Run to have'
         type: number
         required: false
-        default: 2
+        default: 1
     secrets:
       GCLOUD_AUTH:
         required: true

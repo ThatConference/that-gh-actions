@@ -2,7 +2,7 @@ name: Redeploy gateway
 # Redeploys GraphQL gateway forcing it to reload schema's all sub-graphs
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       runMemory:
         description: 'Amount of memory to allocate to google run'

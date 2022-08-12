@@ -15,6 +15,11 @@ on:
         description: 'Branch name which triggered action (github.ref_name)'
         type: string
         required: true
+      nodeVersion: 
+        description: 'Node version used for build'
+        type: number
+        required: false
+        default: 14
     secrets:
       SLACK_WEBHOOK_DEV_NOTIFICATIONS:
         required: true      
@@ -34,10 +39,10 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Use Node.js 14.x
-        uses: actions/setup-node@v1
+      - name: Use Node.js ${{ inputs.nodeVersion }}
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.x
+          node-version: ${{ inputs.nodeVersion }}
       - name: npm ci, run validate
         run: |
           cp .env.sample .env

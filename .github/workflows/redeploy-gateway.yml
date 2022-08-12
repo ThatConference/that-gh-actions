@@ -25,7 +25,7 @@ jobs:
       - name: Setup gcloud action
         uses: google-github-actions/setup-gcloud@v0
         with:
-          version: '360.0.0'
+          version: '397.0.0'
           service_account_key: ${{ secrets.GCLOUD_AUTH }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Redeploy on Cloud Run

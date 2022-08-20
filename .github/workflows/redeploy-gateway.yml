@@ -18,6 +18,8 @@ on:
         required: true
       STELLATE_TOKEN:
         required: true
+      STELLATE_SERVICE:
+        required: true
 
 jobs:
   redeploy:
@@ -51,11 +53,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [redeploy]
     steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v1
-        with:
-          name: tc-api
-          path: __build__
       - name: Use node.js 16x
         uses: actions/setup-node@v3
         with:
@@ -63,9 +60,9 @@ jobs:
       - name: Push to Stellate
         run: |
           npm version
-          cd __build__
           npx stellate version
-          npx stellate push
+          npx stellate pull --service ${{ secrets.STELLATE_SERVICE }}
+          npx stellate push schema --service ${{ secrets.STELLATE_SERVICE }}
         env:
           STELLATE_TOKEN: ${{ secrets.STELLATE_TOKEN }}
           CI: true

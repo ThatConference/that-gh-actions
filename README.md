@@ -66,12 +66,16 @@ jobs:
       GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       SLACK_WEBHOOK_DEV_NOTIFICATIONS: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
 
-  refresh:
-    name: Send refresh request to Gateway
+  redeploy-gateway:
+    name: Redeploy THAT Gateway container
     needs: [build,deploy]
-    uses: thatconference/that-gh-actions/.github/workflows/refresh-gateway-schema.yml@main
-    with:
-      apiName: communications
+    uses: thatconference/that-gh-actions/.github/workflows/redeploy-gateway.yml@main
+    secrets:
+      GCLOUD_AUTH: ${{ secrets.GCLOUD_AUTH }}
+      GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+      SLACK_WEBHOOK_DEV_NOTIFICATIONS: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+      STELLATE_TOKEN: ${{ secrets.STELLATE_TOKEN }}
+      STELLATE_SERVICE: ${{ secrets.STELLATE_SERVICE }}
 
   notifications:
     name: Workflow notifications

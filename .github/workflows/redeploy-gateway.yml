@@ -16,6 +16,8 @@ on:
         required: true
       SLACK_WEBHOOK_DEV_NOTIFICATIONS:
         required: true
+      STELLATE_TOKEN:
+        required: true
 
 jobs:
   redeploy:
@@ -68,4 +70,14 @@ jobs:
           STELLATE_TOKEN: ${{ secrets.STELLATE_TOKEN }}
           CI: true
           HUSKY: 0
+      - name: Slack Failure Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          fields: repo,message,commit,author,eventName,ref,workflow,job,took
+          status: ${{ job.status }}
+          author_name: Push Master CI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_DEV_NOTIFICATIONS }}
+        if: job.status == 'failure' || job.status == 'cancelled'
 

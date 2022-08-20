@@ -65,6 +65,7 @@ jobs:
           npx stellate push schema --service ${{ secrets.STELLATE_SERVICE }}
         env:
           STELLATE_TOKEN: ${{ secrets.STELLATE_TOKEN }}
+          STELLATE_SERVICE: ${{ secrets.STELLATE_SERVICE }}
           CI: true
           HUSKY: 0
       - name: Slack Failure Notification

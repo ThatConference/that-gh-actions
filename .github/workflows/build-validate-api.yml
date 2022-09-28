@@ -29,12 +29,12 @@ jobs:
     name: Build ${{ inputs.apiName }}
     runs-on: ubuntu-latest
     steps:
-      - name: First Interaction
-        uses: actions/first-interaction@v1
-        with:
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
-          issue-message: 'This is your first submitted issue, THANK YOU! Someone will review shortly.'
-          pr-message: 'This is your your first PR, THANK YOU! Someone will review shortly.'
+      # - name: First Interaction
+      #   uses: actions/first-interaction@v1
+      #   with:
+      #     repo-token: ${{ secrets.GITHUB_TOKEN }}
+      #     issue-message: 'This is your first submitted issue, THANK YOU! Someone will review shortly.'
+      #     pr-message: 'This is your your first PR, THANK YOU! Someone will review shortly.'
       - name: Checkout
         uses: actions/checkout@v2
         with:

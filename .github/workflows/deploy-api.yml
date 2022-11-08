@@ -22,6 +22,11 @@ on:
         type: number
         required: false
         default: 0
+      runTimeout:
+        description: 'Timeout in seconds for google run'
+        type: number
+        required: false
+        default: 90
     secrets:
       GCLOUD_AUTH:
         required: true
@@ -88,7 +93,7 @@ jobs:
           C_CNT=$(cat __build__/ccnt.txt)
           SENTRYREL=SENTRY_VERSION=that-api-${{ inputs.apiName }}@$(cat __build__/package.json | jq '.version' | tr -d '"')-$C_CNT.$(echo $GITHUB_SHA | cut -c1-7)
           GCR_ENV_VARS="${GCR_ENV_VARS}, ${SENTRYREL}"
-          gcloud run deploy ${{ inputs.apiName }} --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }} --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars="$GCR_ENV_VARS" --timeout=300 --memory=${{ inputs.runMemory }} --cpu=1 --min-instances=${{ inputs.minInstances }}
+          gcloud run deploy ${{ inputs.apiName }} --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ inputs.apiName }} --region=us-central1 --platform=managed --allow-unauthenticated --set-env-vars="$GCR_ENV_VARS" --timeout=${{ inputs.runTimeout }} --memory=${{ inputs.runMemory }} --cpu=1 --min-instances=${{ inputs.minInstances }}
         env:
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       - name: Slack Failure Notification

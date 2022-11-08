@@ -9,6 +9,11 @@ on:
         type: string
         required: false
         default: '256Mi'
+      runTimeout:
+        description: 'Timeout in seconds for google run'
+        type: number
+        required: false
+        default: 90
     secrets:
       GCLOUD_AUTH:
         required: true
@@ -35,7 +40,7 @@ jobs:
       - name: Redeploy on Cloud Run
         # Environment vars should remain between deploys if not specified in command
         run: |
-          gcloud run deploy gateway --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/gateway --region=us-central1 --platform=managed --allow-unauthenticated --timeout=300 --memory=${{ inputs.runMemory }} --cpu=1
+          gcloud run deploy gateway --image us.gcr.io/${{ secrets.GCP_PROJECT_ID }}/gateway --region=us-central1 --platform=managed --allow-unauthenticated --timeout=${{ inputs.runTimeout }} --memory=${{ inputs.runMemory }} --cpu=1
         env:
           CLOUDSDK_CORE_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
       - name: Slack Failure Notification

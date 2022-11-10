@@ -36,7 +36,7 @@ jobs:
       #     issue-message: 'This is your first submitted issue, THANK YOU! Someone will review shortly.'
       #     pr-message: 'This is your your first PR, THANK YOU! Someone will review shortly.'
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ inputs.nodeVersion }}

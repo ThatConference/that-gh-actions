@@ -39,10 +39,10 @@ on:
 jobs:
   validate_input:
     name: Validate inputs
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: apiName is valid
-        if: contains(fromJson('["gateway","events","partners","sessions","members","garage","communications"]'), inputs.apiName) == false
+        if: contains(fromJson('["gateway","events","partners","sessions","members","garage","communications","help"]'), inputs.apiName) == false
         run: |
           echo 'Unable to deploy, invalid apiName provided'
           echo 'apiName: ${{ inputs.apiName }}'
@@ -63,7 +63,7 @@ jobs:
   deploy:
     name: Deploy ${{ inputs.apiName}} to Cloud Run
     needs: validate_input
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Download Build Artifact
         uses: actions/download-artifact@v1

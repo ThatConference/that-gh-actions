@@ -1,0 +1,58 @@
+name: Shared API Source Map Push
+
+# uses Sentry Action: https://github.com/marketplace/actions/sentry-release
+
+on: 
+  workflow_call:
+    secrets:
+      SENTRY_SOURCE_MAP_TOKEN:
+        required: true
+      SENTRY_ORG:
+        required: true
+      SENTRY_PROJECT:
+        required: true
+    
+    inputs:
+      environment:
+        description: 'environment maps belong to, default production'
+        type: string
+        required: false
+        default: 'production'
+      sourcemaps:
+        description: 'location of source maps'
+        type: string
+        required: false 
+        default: './__build__'
+      version:
+        description: 'set version to override package.json version (default)'
+        type: string 
+        required: false 
+        default: '0.0.0'
+
+
+jobs:
+  push-maps:
+    name: Push Maps
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: tc-api
+          path: __build__
+      - name: Use provided override version
+        if: ${{ inputs.version != '0.0.0'}}
+        run: |
+          echo PKG_VERSION=${{ inputs.version }}
+          echo version is: $PKG_VERSION or ${{ env.PKG_VERSION }}  
+      - name: Use package.json version 
+        if: ${{ inputs.version == '0.0.0' }}
+        run: |
+          echo PKG_VERSION=$(cat __build__/package.json | jq '.version' | tr -d '"') >> $GITHUB_ENV
+          echo version is: $PKG_VERSION or ${{ env.PKG_VERSION }}
+      - name: Push maps to Sentry
+        uses: getsentry/action-release@v1
+        with:
+          environment: ${{ inputs.apiName }}
+          sourcemaps: ${{ inputs.sourcemaps}}
+          version: ${{ env.PKG_VERSION }}

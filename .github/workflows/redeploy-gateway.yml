@@ -29,7 +29,7 @@ on:
 jobs:
   redeploy:
     name: Redeploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Setup gcloud action
         uses: google-github-actions/setup-gcloud@v0
@@ -55,7 +55,7 @@ jobs:
         if: job.status == 'failure' || job.status == 'cancelled'
   stellate:
     name: Push Stellate rules
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: [redeploy]
     steps:
       - name: Use node.js 16x

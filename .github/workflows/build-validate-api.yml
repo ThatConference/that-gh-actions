@@ -27,7 +27,7 @@ on:
 jobs:
   build:
     name: Build ${{ inputs.apiName }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       # - name: First Interaction
       #   uses: actions/first-interaction@v1

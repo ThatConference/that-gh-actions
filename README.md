@@ -80,7 +80,7 @@ jobs:
   notifications:
     name: Workflow notifications
     needs: [build,deploy,refresh]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Slack Notification
         uses: 8398a7/action-slack@v3

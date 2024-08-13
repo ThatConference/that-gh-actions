@@ -19,7 +19,7 @@ on:
         description: 'Node version used for build'
         type: number
         required: false
-        default: 18
+        default: 20
     secrets:
       SLACK_WEBHOOK_DEV_NOTIFICATIONS:
         required: true      
@@ -36,11 +36,11 @@ jobs:
       #     issue-message: 'This is your first submitted issue, THANK YOU! Someone will review shortly.'
       #     pr-message: 'This is your your first PR, THANK YOU! Someone will review shortly.'
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Use Node.js ${{ inputs.nodeVersion }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ inputs.nodeVersion }}
       - name: npm ci, run validate
@@ -60,7 +60,7 @@ jobs:
           git rev-list --count ${{ inputs.branchName }} > __build__/ccnt.txt
         if: inputs.isForDeploy
       - name: Archive Build Artifact
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: tc-api
           path: __build__

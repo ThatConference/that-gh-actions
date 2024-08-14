@@ -66,18 +66,18 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download Build Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: tc-api
           path: __build__
       - name: Setup google auth for github actions
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}                    
       - name: Setup GCLOUD CLI Action
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          version: '428.0.0'
+          version: '437.0.1'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: gcloud docker cred helper
         run: gcloud auth configure-docker

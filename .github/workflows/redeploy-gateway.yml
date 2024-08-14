@@ -32,13 +32,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Setup google auth for github actions
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}          
       - name: Setup gcloud CLI action
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
         with:
-          version: '428.0.0'
+          version: '437.0.1'
           project_id: ${{ secrets.GCP_PROJECT_ID }}
       - name: Redeploy on Cloud Run
         # Environment vars should remain between deploys if not specified in command
@@ -61,10 +61,10 @@ jobs:
     runs-on: ubuntu-22.04
     needs: [redeploy]
     steps:
-      - name: Use node.js 18
-        uses: actions/setup-node@v3
+      - name: Use node.js 20
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
       - name: Push to Stellate
         run: |
           npm version
